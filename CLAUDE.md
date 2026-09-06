@@ -32,6 +32,11 @@ Currently early in Month 1 (Week 1-2 territory) of the 6-month build plan.
   (pin names IN1-IN4, ENA/ENB, and a note about removing the speed-lock jumpers).
 - **ELEGOO 120pcs jumper wire kit** (M-F, M-M, F-F assorted) — covers Week 2's
   wiring needs.
+- **Gardner Bender GDT-311 digital multimeter** — manual-range, no dedicated
+  continuity/beep mode (use the 200Ω setting on the resistance dial instead;
+  a reading near 0 = continuity, "1" on the left edge of the display = open
+  circuit/no continuity). Bought while debugging the Week 2 motor test; also
+  covers Week 5's voltage-divider work.
 
 ## Still needed
 - **Breadboard** (half or full size) — not included in any kit purchased so far.
@@ -88,6 +93,38 @@ Currently early in Month 1 (Week 1-2 territory) of the 6-month build plan.
   repeatedly since it's screwless. Both manuals now reflect this.
 - Chose 2WD over 4WD deliberately — simpler differential-drive control matches
   the manual's code, adequate for indoor hard-floor use.
+- **Debugged (2026-09-05) why `motor_test.py` ran with no errors but the
+  wheels never moved.** Software was confirmed correct at every layer along
+  the way (gpiozero's `Motor(enable=...)` holds the enable pin permanently
+  HIGH by design — PWM speed control happens on the forward/backward pins,
+  not the enable pin; `pinctrl get` confirmed the Pi was toggling the right
+  BCM pins; swapping in the second L298N from the 2-pack ruled out a fried
+  board). The actual root cause: **the 40-pin GPIO header's pin-1 orientation
+  was being read backwards** (pin 1 is marked by a small white square
+  silkscreen outline at one corner of the header — it was assumed to be at
+  the opposite corner, near the fan connector, when it's actually at the
+  corner near the power button). This meant the ground wire (and potentially
+  some control wires) were landed on the wrong physical pins the whole time,
+  even though the code and BCM pin numbers were always correct. Confirmed
+  via multimeter continuity test (200Ω range, Pi physical pin 6 to L298N GND
+  terminal read open/"1" with the wrong orientation assumed, then 0/continuous
+  once corrected). Fixed by re-seating the wires with the correct orientation.
+  Confirmed working GPIO pin mapping for `motor_test.py`:
+  | Function | Motor | BCM GPIO | Physical pin | L298N pin |
+  |---|---|---|---|---|
+  | forward | Left | GPIO17 | pin 11 | IN1 |
+  | backward | Left | GPIO27 | pin 13 | IN2 |
+  | enable | Left | GPIO22 | pin 15 | ENA |
+  | forward | Right | GPIO23 | pin 16 | IN3 |
+  | backward | Right | GPIO24 | pin 18 | IN4 |
+  | enable | Right | GPIO25 | pin 22 | ENB |
+  | ground | — | GND | pin 6 (any GND pin works) | GND (power terminal block) |
+  Note the L298N's own `+12V` terminal is fed directly from the battery box,
+  never from the Pi — there's no "12V pin" on the Pi side of that connection.
+  Also confirmed: `LGPIOFactory(chip=15)` in `motor_test.py` is correct for
+  this Pi 5 — `gpiodetect` shows `pinctrl-rp1` at gpiochip15 (this can drift
+  across reboots/OS updates on a Pi 5, so re-check with `gpiodetect` first if
+  this ever breaks again before assuming it's the same bug).
 
 ## Philosophy/approach agreed on
 - Goal is testing genuine interest over time, not accelerating toward a specific
