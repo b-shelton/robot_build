@@ -22,5 +22,14 @@ print("Both forward")
 left.forward(0.6)
 right.forward(0.6)
 sleep(2)
+
+left.stop()
+right.stop()
+
+print("Both forward")
+left.backward(0.6)
+right.backward(0.6)
+sleep(2)
+
 left.stop()
 right.stop()
