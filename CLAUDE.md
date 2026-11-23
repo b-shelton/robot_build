@@ -54,17 +54,29 @@ Currently in Month 1, Week 3: `drive.py` keyboard remote control is working, inc
   full 5V/5A to the Pi 5 without bottlenecking it back down to 15W. Use
   this cable (not the bank's bundled one, whose rating wasn't confirmed)
   for the Pi 5 connection.
+- **ELEGOO mini breadboard kit, 6-pack (170-point solderless)** — chosen over a
+  400-point half-size board to save chassis space. 17 columns × 2 halves of
+  5-hole strips, **no power rails** (use one column as a ground column, or wire
+  sensor VCC/GND straight to the Pi's header — it has two 5V and eight GND pins).
+  First use is Week 5's voltage divider; spares for later sensors, and they snap
+  together if more room is ever needed.
+- **BOJACK 1000 pcs resistor kit, 25 values (1Ω–1MΩ), 5%, 1/4W carbon film** —
+  covers Week 5's voltage divider and Month 3's 470Ω NeoPixel data-line
+  resistor. Use **220Ω from Echo, 330Ω to GND** (≈3.0V at the Pi) — the adult
+  manual has these swapped (330 series / 220 to GND ≈ 2.0V, too marginal).
+  1kΩ/2kΩ is an equally good alternative pair (≈3.3V). Verify any resistor
+  with the multimeter (2kΩ range: a 330Ω reads ~0.330).
+- **ELEGOO HC-SR04 ultrasonic sensor, 5-pack** — Week 5. Wiring per the manual
+  (VCC → Pi 5V, GND → Pi GND, Trig → GPIO 5, Echo → divider → GPIO 6), but
+  `distance_test.py` needs the same `LGPIOFactory(chip=15)` setup lines as the
+  motor scripts.
 
 ## Still needed
-- **Breadboard** (half or full size) — not included in any kit purchased so far.
-  Turns out it's *not* actually needed for Week 2 (all that wiring is direct
-  jumpers/screw terminals, no breadboard involved) — first real use is Week 5's
-  ultrasonic sensor voltage divider (two resistors in series). Fine to order
-  any time before Week 5, not a Week 2 blocker. Both manuals corrected to
-  reflect this.
-- Everything else in the Month 2+ parts lists (ultrasonic sensor, cliff sensors,
-  NeoPixel ring, speaker, Pi Camera, microphone, etc.) — not yet purchased,
-  already fully specified in the adult manual's per-week parts tables.
+- Everything else in the Month 2+ parts lists (cliff sensors, NeoPixel ring,
+  speaker, Pi Camera, microphone, etc.) — not yet purchased, already fully
+  specified in the adult manual's per-week parts tables.
+- Zip ties / velcro straps (Week 4 wire management), and eventually a short
+  (~1 ft) 5A-rated USB-C cable to replace the long Baseus loop on the chassis.
 
 ## Remote access (SSH) — set up and working
 - Connecting from a Chromebook (no Linux/Crostini support on this device) using
@@ -114,6 +126,14 @@ Currently in Month 1, Week 3: `drive.py` keyboard remote control is working, inc
   lid is the only GPIO access point on this case (no side cutout) and the jumper
   bundle will be exiting through that same opening. No cost to lifting it on/off
   repeatedly since it's screwless. Both manuals now reflect this.
+- **Chassis layout (2026-11-22):** TalentCell power bank lengthwise in the
+  center, just ahead of the drive-wheel axle, with the L298N (front end) and
+  the Pi (behind it) velcroed on top of the bank. Replaced the original layout
+  (bank across the front edge over the caster), which put weight on the caster
+  instead of the drive wheels and blocked the Week 5 sensor spot. Front edge is
+  now kept clear for sensors. Blueprint artifact:
+  https://claude.ai/artifact/JVkBM1deNUeMjKX55CzhDo ("Option A"; "Option B" =
+  second deck on M3 standoffs, a possible later upgrade if the top gets crowded).
 - Chose 2WD over 4WD deliberately — simpler differential-drive control matches
   the manual's code, adequate for indoor hard-floor use.
 - **Debugged (2026-09-05) why `motor_test.py` ran with no errors but the
