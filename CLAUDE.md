@@ -37,6 +37,23 @@ Currently early in Month 1 (Week 1-2 territory) of the 6-month build plan.
   a reading near 0 = continuity, "1" on the left edge of the display = open
   circuit/no continuity). Bought while debugging the Week 2 motor test; also
   covers Week 5's voltage-divider work.
+- **TalentCell 12V 7000mAh power bank (76.65Wh, PB030201-35)** — Week 4's USB
+  power bank for untethering the Pi 5. Chosen after several other listings were
+  ruled out: most "45-65W PD" power banks only deliver that wattage at higher
+  voltages (9V/12V/20V) and cap their 5V rail at 3A (15W), which is *not*
+  enough for the Pi 5 — this model's USB-C port is explicitly spec'd for
+  true 5V/5A (25W) output, confirmed both in the listing text and by
+  TalentCell contrasting it against typical 5V/3A competitor power banks.
+  Also has an LED display showing battery percentage (0-100%), so low
+  battery can be spotted before it cuts the Pi off mid-session. Includes a
+  DC 12V port/DC5521 cable (for future 12V accessories like LED strips —
+  not needed for the Pi) and a bundled USB-C cable of unconfirmed amperage.
+- **Baseus 100W PD 5A USB-C to USB-C cable** — bought alongside the power
+  bank specifically because a cable also needs to be rated for 5A (not just
+  the standard 3A most cables carry) to actually deliver the TalentCell's
+  full 5V/5A to the Pi 5 without bottlenecking it back down to 15W. Use
+  this cable (not the bank's bundled one, whose rating wasn't confirmed)
+  for the Pi 5 connection.
 
 ## Still needed
 - **Breadboard** (half or full size) — not included in any kit purchased so far.
@@ -45,8 +62,6 @@ Currently early in Month 1 (Week 1-2 territory) of the 6-month build plan.
   ultrasonic sensor voltage divider (two resistors in series). Fine to order
   any time before Week 5, not a Week 2 blocker. Both manuals corrected to
   reflect this.
-- **USB power bank** (Week 4) — needs USB-C PD output, 5V/5A (25W+) to properly
-  power the Pi 5 untethered. Not yet purchased/researched.
 - Everything else in the Month 2+ parts lists (ultrasonic sensor, cliff sensors,
   NeoPixel ring, speaker, Pi Camera, microphone, etc.) — not yet purchased,
   already fully specified in the adult manual's per-week parts tables.
@@ -125,6 +140,22 @@ Currently early in Month 1 (Week 1-2 territory) of the 6-month build plan.
   this Pi 5 — `gpiodetect` shows `pinctrl-rp1` at gpiochip15 (this can drift
   across reboots/OS updates on a Pi 5, so re-check with `gpiodetect` first if
   this ever breaks again before assuming it's the same bug).
+- **Debugged (2026-11-22) `lgpio.error: 'can not open gpiochip'` on
+  `motor_test.py`** even though `gpiodetect` still showed `pinctrl-rp1` at
+  gpiochip15, user `bob` was in the `gpio` group, and a direct
+  `lgpio.gpiochip_open(15)` worked. Root cause (found via `strace`): the
+  installed `gpiozero` library's `LGPIOFactory.__init__` **ignores the `chip`
+  argument** — it unconditionally overwrites it with 4 (if `/dev/gpiochip4`
+  exists on a Pi 5) or else 0, and this Pi has neither, so it tried
+  `/dev/gpiochip0` and failed. Likely worked in September because the OS then
+  provided a `/dev/gpiochip4` symlink. Fix: patched
+  `/usr/lib/python3/dist-packages/gpiozero/pins/lgpio.py` so that line only
+  runs `if chip is None:` (backup at `~/lgpio.py.backup` on the Pi).
+  **An `apt upgrade` of `python3-gpiozero` may silently revert this patch** —
+  if the same error returns, check that line first and re-apply.
+  Side notes: Pi username is `bob`, project lives at `~/robot_build` on the Pi;
+  stale `.lgd-nfy0` FIFO files that lgpio leaves in the working directory are
+  harmless and were a red herring.
 
 ## Philosophy/approach agreed on
 - Goal is testing genuine interest over time, not accelerating toward a specific
