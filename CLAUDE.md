@@ -12,7 +12,7 @@ No prior electronics experience — appreciate wiring/GPIO basics being explaine
 the first time a new concept comes up.
 
 ## Where things stand
-Currently early in Month 1 (Week 1-2 territory) of the 6-month build plan.
+Currently in Month 1, Week 3: `drive.py` keyboard remote control is working, including from an iPhone/iPad over SSH.
 
 ## Parts already purchased
 - **Raspberry Pi 5 kit** — CanaKit Raspberry Pi 5 Starter Kit PRO, Turbine Black
@@ -82,6 +82,14 @@ Currently early in Month 1 (Week 1-2 territory) of the 6-month build plan.
 - Known/working connection recipe going forward: Chromebook → Secure Shell
   extension → New Connection → username `pi` (or custom login) → Pi's IP
   address (not `.local` hostname) → port 22.
+- **Mac:** built-in Terminal, `ssh bob@<Pi IP>` (Pi username is `bob`).
+- **iPhone/iPad (working, 2026-11-22):** Termius app (free tier), host saved as
+  "bob the robot" — Hostname = Pi's IP only, Username = `bob` in its own field
+  (putting `bob@raspberrypi.local` in the Hostname field fails with "unknown
+  node or service"). Used to drive the robot with `drive.py` (Week 3).
+- Multiple SSH sessions at once are fine, but only one copy of a motor script
+  can hold the GPIO pins at a time — quit `drive.py` (Q) in one session before
+  starting it in another.
 
 ## Key decisions/clarifications made so far
 - Flashing is skipped (pre-loaded SD card) — do NOT re-run Raspberry Pi Imager on
