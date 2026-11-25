@@ -8,6 +8,7 @@ from gpiozero import Device
 Device.pin_factory = LGPIOFactory(chip=15)  # re-check with `gpiodetect` if this breaks
 
 import curses
+import signal
 from gpiozero import Motor
 
 left = Motor(forward=17, backward=27, enable=22, pwm=True)
@@ -50,6 +51,15 @@ def drive(stdscr):
         stdscr.addstr(2, 0, f"{status:<20}")
         stdscr.refresh()
 
+
+def _shutdown(signum, frame):
+    raise SystemExit  # lets the `finally` below stop the motors
+
+
+# If the SSH connection drops (e.g. phone screen locks) or the script is killed,
+# still stop the motors instead of leaving the robot driving.
+signal.signal(signal.SIGHUP, _shutdown)
+signal.signal(signal.SIGTERM, _shutdown)
 
 try:
     curses.wrapper(drive)

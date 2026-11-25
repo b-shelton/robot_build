@@ -12,7 +12,7 @@ No prior electronics experience — appreciate wiring/GPIO basics being explaine
 the first time a new concept comes up.
 
 ## Where things stand
-Currently in Month 1, Week 3: `drive.py` keyboard remote control is working, including from an iPhone/iPad over SSH.
+Currently in Month 2, Week 5: HC-SR04 wired and `distance_test.py` confirmed working (2026-11-25) — reads from ~2 cm up to the 200 cm cap set by `max_distance=2`. Confirmed Week 5 wiring: sensor plugged into mini breadboard row e cols 1-4 (VCC, Trig, Echo, Gnd); 220Ω 3b→8b, 330Ω 8c→12c; col 1 → Pi pin 2 (5V), col 2 → pin 29 (GPIO5 Trig), col 8 → pin 31 (GPIO6 Echo via divider), col 4 ↔ col 12 (M-M), col 12 → pin 39 (GND). Pinout blueprint in this orientation: https://claude.ai/artifact/7Vbiz9sP9TmVAyYnWi3C3t
 
 ## Parts already purchased
 - **Raspberry Pi 5 kit** — CanaKit Raspberry Pi 5 Starter Kit PRO, Turbine Black
