@@ -20,8 +20,8 @@ sensor = DistanceSensor(echo=6, trigger=5, max_distance=2)
 
 # --- Tune these together (Wednesday's job) ---
 SAFE_DISTANCE = 0.20  # meters: react when something is closer than this
-DRIVE_SPEED = 0.5     # forward/backward speed (0 to 1)
-TURN_SPEED = 0.45     # spin speed; spins at 0.6 felt too quick. Raise it if the motors just hum.
+DRIVE_SPEED = 0.7     # forward/backward speed (0 to 1); 0.5 stalled the motors
+TURN_SPEED = 0.6      # spin speed; lower values stalled. Shorten TURN_TIME for smaller turns.
 BACKUP_TIME = 0.5     # seconds of reversing
 TURN_TIME = 0.4       # seconds of spinning (longer = bigger turn)
 
